@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en" class="no-js" data-theme="dark" data-motion="full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Build a Server From Scratch</title>
+<meta name="description" content="A visual, beginner-friendly guide to building a server: buying the rig, every component and spec, assembly, BIOS, RAID, OS, networking, security and backups. Every visual drawn live with code.">
+<meta name="color-scheme" content="dark light">
+<script>
+  // Apply saved theme/motion before first paint to avoid a flash.
+  (function () {
+    var d = document.documentElement; d.className = d.className.replace('no-js', 'js');
+    try {
+      var t = JSON.parse(localStorage.getItem('srv.theme'));
+      var m = JSON.parse(localStorage.getItem('srv.motion'));
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      if (!m) m = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'calm' : 'full';
+      d.setAttribute('data-theme', t); d.setAttribute('data-motion', m);
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/visuals.css">
+</head>
+<body>
+<a class="skip-link" href="#ch1">Skip to the guide</a>
+
+<header class="site-header">
+  <a class="brand" href="#top" aria-label="Build a Server — back to top"><canvas id="brand-mark" width="52" height="52" aria-hidden="true"></canvas><span>BUILD&nbsp;A&nbsp;SERVER</span></a>
+  <div class="header-spacer"></div>
+  <div class="header-tools">
+    <button class="icon-btn toc-btn" id="toc-open" aria-haspopup="dialog" aria-controls="toc-dialog"><span aria-hidden="true">☰</span><span class="lbl">Chapters</span></button>
+    <button class="icon-btn" id="motion-btn" title="Animation level"><span aria-hidden="true">◐</span><span class="lbl">Motion: <span id="motion-val">Full</span></span></button>
+    <button class="icon-btn" id="pause-btn" aria-pressed="false" title="Pause all animation"><span aria-hidden="true">❚❚</span><span class="lbl">Pause all</span></button>
+    <button class="icon-btn" id="theme-btn" title="Switch light or dark"><span aria-hidden="true">☼</span><span class="lbl">Theme</span></button>
+  </div>
+</header>
+<div class="progress-bar" id="progress" aria-hidden="true"></div>
+
+<nav class="toc" id="toc" aria-label="Chapters"></nav>
+<dialog class="toc-dialog" id="toc-dialog" aria-label="Chapters">
+  <header><strong>Chapters</strong><button class="icon-btn" id="toc-close" aria-label="Close chapters">✕</button></header>
+  <nav class="toc" id="toc-mobile" aria-label="Chapters (menu)"></nav>
+</dialog>
+
+<main id="top">
+
+<!-- ======================= HERO ======================= -->
+<section class="hero scrolly-hero" data-scrolly aria-label="Introduction">
+  <div class="hero-sticky">
+    <figure class="viz" data-visual="hero" aria-label="A dark datacenter. As you scroll, the camera dives toward one server, slides it out, removes the lid and explodes its parts into a blueprint.">
+      <div class="viz-stage"></div>
+      <p class="viz-live sr-only" aria-live="polite"></p>
+    </figure>
+    <div class="hero-copy" id="hero-copy">
+      <p class="hero-kicker">A visual guide for total beginners</p>
+      <h1>Build a server.<br><em>From scratch.</em></h1>
+      <p class="hero-post mono" id="hero-post" aria-hidden="true"></p>
+    </div>
+    <p class="hero-caption" id="hero-caption"><b>This is what you'll build.</b> Every part, every number, every step — explained with pictures you can poke.</p>
+    <div class="hero-scroll" aria-hidden="true">Scroll to dive in<i></i></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+<!-- ======================= PART A: PLAN ======================= -->
+<div class="part-divider" id="part-plan">
+  <p>Part A · Plan</p>
+  <h2>Before you buy a single screw: know what a server is, what yours must do, and where to get it.</h2>
+  <div class="rule"></div>
+</div>
+
+<!-- CH 1 -->
+<section class="chapter" id="ch1" data-ch="1" data-part="Plan" data-short="What is a server?" aria-labelledby="ch1-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">01</span>Plan</p>
+    <h2 id="ch1-h">What is a server, really?</h2>
+    <p class="ch-lead">An ordinary computer, rearranged to serve many people, around the clock, with nobody sitting at it.</p>
+  </header>
+
+  <div class="scrolly" data-scrolly>
+    <div class="scrolly-sticky">
+      <figure class="viz" data-visual="morph" style="--ar:16/11;--ar-sm:1/1" aria-labelledby="v-morph-t" aria-describedby="v-morph-d">
+        <figcaption id="v-morph-t"><span class="tag sig">★ Signature</span> The Morph · desktop → server</figcaption>
+        <div class="viz-stage"></div>
+        <div class="viz-controls"></div>
+        <p class="viz-live sr-only" aria-live="polite"></p>
+        <details class="viz-alt"><summary>Describe this visual</summary><p id="v-morph-d">A desktop tower tips onto its side and flattens. Its fans line up into a fan wall, its single power supply splits into two hot-swap units, its drives move to front hot-swap bays, and it becomes a thin 1U rack server that slides into a rack.</p></details>
+      </figure>
+    </div>
+    <div class="scrolly-steps">
+      <div class="step" data-step="0"><article class="card"><h3>Start with a desktop</h3><p>Same ingredients you already know: a <b>CPU</b>, <b>memory</b>, <b>drives</b>, a <b>power supply</b> and <b>fans</b>.</p></article></div>
+      <div class="step" data-step="1"><article class="card"><h3>Lay it down, make it thin</h3><p>Servers stack in racks, so they're flat and wide. Height is measured in <b>“U”</b> — one U is 1.75 inches.</p></article></div>
+      <div class="step" data-step="2"><article class="card"><h3>Air goes one way</h3><p>Fans line up into a <b>fan wall</b>. Cool air enters the front, hot air leaves the back. No exceptions.</p></article></div>
+      <div class="step" data-step="3"><article class="card"><h3>Everything doubled, everything swappable</h3><p><b>Two power supplies</b> and <b>front drive bays</b> you can pull while it runs. One part dies, the server keeps serving.</p></article></div>
+      <div class="step" data-step="4"><article class="card"><h3>Into the rack</h3><p>Rack ears, rails, and a tiny remote-control computer inside. It will run for years without a monitor or keyboard.</p></article></div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <article class="card"><h3>Its job: answer requests</h3><p>A server is a computer whose job is answering requests from other computers — websites, files, games. It runs all day, every day, usually with no screen attached.</p></article>
+    <article class="card"><h3>Built for many, not one</h3><p>Your laptop is built for one person. A server is built for many people at once, and keeps running even when a part fails.</p></article>
+    <article class="card"><h3>Familiar parts, plus extras</h3><p>Servers add <b>error-correcting memory</b>, <b>spare power supplies</b> and a built-in <b>remote-control chip</b>.</p></article>
+  </div>
+
+  <figure class="viz" data-visual="failover" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-fail-t" aria-describedby="v-fail-d">
+    <figcaption id="v-fail-t"><span class="tag">Try it</span> Break a part · desktop vs server</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-fail-d">Phones and laptops send request dots to a desktop and a server. Breaking a power supply or drive makes the desktop go dark, while the server switches to its spare part and keeps answering.</p></details>
+  </figure>
+</section>
+
+<!-- CH 2 -->
+<section class="chapter" id="ch2" data-ch="2" data-part="Plan" data-short="Start with the job" aria-labelledby="ch2-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">02</span>Plan</p>
+    <h2 id="ch2-h">Start with the job, not the parts</h2>
+    <p class="ch-lead">Decide what the server will do. The job picks the parts — and finds your bottleneck.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Never shop first</h3><p>Decide the job — store files, host a game, run virtual machines — and let that job pick the parts.</p></article>
+    <article class="card"><h3>Every job is hungry for something</h3><p>File servers crave <b>disk space</b>. Databases crave <b>fast storage and memory</b>. AI craves <b>GPU memory</b>.</p></article>
+    <article class="card"><h3>Plan two years ahead</h3><p>A little extra capacity now costs far less than replacing the whole server later.</p></article>
+  </div>
+  <figure class="viz" data-visual="workload" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-work-t" aria-describedby="v-work-d">
+    <figcaption id="v-work-t"><span class="tag">Try it</span> Workload heat map · what does your job stress?</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-work-d">Pick a workload (file server, web, database, virtual machines, game server, media, AI). Components of an isometric server glow by how hard that workload stresses them; the most stressed one is labelled the bottleneck.</p></details>
+  </figure>
+</section>
+
+<!-- CH 3 -->
+<section class="chapter" id="ch3" data-ch="3" data-part="Plan" data-short="Buy, build, or refurb?" aria-labelledby="ch3-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">03</span>Plan</p>
+    <h2 id="ch3-h">Buy, build, or refurb?</h2>
+    <p class="ch-lead">You're trading money for support for control. The price tag is only part of the cost.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Brand-name</h3><p><b>Dell PowerEdge</b>, <b>HPE ProLiant</b>, <b>Lenovo ThinkSystem</b>: tested, warrantied, phone support. You pay for peace of mind — and sometimes feature licenses.</p></article>
+    <article class="card"><h3>Barebones</h3><p><b>Supermicro</b>, ASRock Rack, Gigabyte: case, board and power supplies included. You add CPU, memory and drives.</p></article>
+    <article class="card"><h3>Refurbished</h3><p>Off-lease business servers are shockingly cheap, but older, louder and hungry for electricity. Check the power bill first.</p></article>
+    <article class="card"><h3>Full DIY</h3><p>Total freedom — and you become the warranty department when something doesn't work.</p></article>
+  </div>
+  <figure class="viz" data-visual="triangle" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-tri-t" aria-describedby="v-tri-d">
+    <figcaption id="v-tri-t"><span class="tag">Try it</span> The tradeoff triangle · drag the puck</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-tri-d">A triangle with corners Cost (cheap), Convenience (support, warranty) and Control (choose every part). Dragging a puck highlights the nearest buying option: brand-name (Dell, HPE, Lenovo), Supermicro barebones, DIY, or refurbished. A server preview changes its front bezel and remote-management name.</p></details>
+  </figure>
+  <figure class="viz" data-visual="tco" style="--ar:16/7;--ar-sm:4/5" aria-labelledby="v-tco-t" aria-describedby="v-tco-d">
+    <figcaption id="v-tco-t"><span class="tag">Try it</span> 5-year true cost · purchase is only the start</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-tco-d">Stacked bars of purchase price, support, electricity and your time over five years, for each buying option. Changing the electricity price re-flows the bars. A cheap refurbished server can cost more in power than it did to buy.</p></details>
+  </figure>
+  <figure class="viz" data-visual="lease" style="--ar:16/6;--ar-sm:3/2" aria-labelledby="v-lease-t" aria-describedby="v-lease-d">
+    <figcaption id="v-lease-t">Where refurbs come from · the lease conveyor</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-lease-d">Servers ride a conveyor belt through three to five years of business use, then drop into the refurbished market at about 20 to 30 percent of their original price.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · budget tiers</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Tier</th><th>Approx. cost</th><th>Typical build</th><th>Watch out</th></tr></thead><tbody>
+      <tr><td>Homelab (used)</td><td>$300–800</td><td>Off-lease Dell R640/R740 or HPE DL360/DL380 Gen10, 64–256 GB DDR4 ECC</td><td>Noise, 100–250 W idle, missing caddies/rails</td></tr>
+      <tr><td>Small business (new)</td><td>$2,000–5,000</td><td>Dell PowerEdge T360/R360, HPE ProLiant ML30/DL20 Gen11, Lenovo ST250 V3, or Supermicro EPYC 4005</td><td>OS licensing, warranty level, backup target extra</td></tr>
+      <tr><td>Performance</td><td>$8,000–30,000+</td><td>2U EPYC 9005 or Xeon 6, 256–768 GB DDR5, 4–12 NVMe, 25 GbE</td><td>Per-core licensing, 230 V power, cooling</td></tr>
+      <tr><td>AI / GPU</td><td>$15,000–300,000+</td><td>1–8 datacenter GPUs in a GPU-certified 2U/4U chassis</td><td>Several kW of power, lead times</td></tr>
+    </tbody></table>
+    <p class="approx">Approximate USD, late 2026. Memory and SSD prices have been volatile — always re-check.</p>
+  </div></details>
+  <p class="mistakes-title">Hidden costs beginners forget</p>
+  <ul class="mistakes"><li>Rails &amp; drive caddies</li><li>UPS &amp; switch</li><li>OS licenses</li><li>Remote-management license</li><li>Backup storage</li><li>Electricity</li><li>Your time</li></ul>
+</section>
+
+<!-- ======================= PART B: HARDWARE ======================= -->
+<div class="part-divider" id="part-hardware">
+  <p>Part B · Hardware</p>
+  <h2>Every component, what its numbers mean, and how those numbers change real performance.</h2>
+  <div class="rule"></div>
+</div>
+
+<!-- CH 4 -->
+<section class="chapter" id="ch4" data-ch="4" data-part="Hardware" data-short="Towers, racks & “U”" aria-labelledby="ch4-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">04</span>Hardware · Chassis</p>
+    <h2 id="ch4-h">Shapes &amp; sizes: towers, racks and “U”</h2>
+    <p class="ch-lead">U is just height. Thin means dense but loud. Taller means more room and quieter fans.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Measured in U</h3><p>One U is <b>1.75 in (44.45 mm)</b>. A “2U server” is 3.5 inches tall and slides into a standard <b>19-inch</b> rack.</p></article>
+    <article class="card"><h3>Thin boxes scream</h3><p>1U servers need tiny, fast 40 mm fans. Taller 2U and 4U boxes use bigger, slower fans and fit more drives.</p></article>
+    <article class="card"><h3>No rack? Tower.</h3><p>A tower server stands on the floor like a desktop, runs quieter, and is perfect for an office closet.</p></article>
+    <article class="card"><h3>Measure depth!</h3><p>Many rack servers are <b>28–32 in</b> deep and won't fit a shallow wall-mounted rack.</p></article>
+  </div>
+  <figure class="viz" data-visual="rack" style="--ar:16/10;--ar-sm:3/4" aria-labelledby="v-rack-t" aria-describedby="v-rack-d">
+    <figcaption id="v-rack-t"><span class="tag">Try it</span> Rack builder · stack it safely</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-rack-d">A 42U rack with numbered units. Add 1U, 2U and 4U servers, a switch, a UPS and blanking panels; they snap to unit boundaries. A center-of-gravity marker warns when heavy equipment is placed too high.</p></details>
+  </figure>
+  <figure class="viz" data-visual="lineup" style="--ar:16/7;--ar-sm:4/5" aria-labelledby="v-line-t" aria-describedby="v-line-d">
+    <figcaption id="v-line-t">Form factors to scale · listen to the fans</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-line-d">1U, 2U, 4U and tower servers drawn to scale with drive bay counts and fan sizes. Rings around each fan show noise: smaller fans spin faster and are louder.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · chassis</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Form</th><th>Drive bays</th><th>Fans</th><th>Best for</th></tr></thead><tbody>
+      <tr><td>1U</td><td>4 × 3.5″ or 10 × 2.5″</td><td>40 mm, loud</td><td>Density, web servers</td></tr>
+      <tr><td>2U</td><td>12 × 3.5″ or 24 × 2.5″</td><td>60 mm</td><td>The best default</td></tr>
+      <tr><td>4U</td><td>36–90 × 3.5″</td><td>80–120 mm</td><td>Bulk storage, multi-GPU</td></tr>
+      <tr><td>Tower</td><td>4–8</td><td>92–120 mm, quiet</td><td>Office, home</td></tr>
+    </tbody></table></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>A 1U in the living room</li><li>Ignoring rack depth</li><li>Assuming caddies are included</li><li>Racking heavy gear on top</li></ul>
+</section>
+
+<!-- CH 5 -->
+<section class="chapter" id="ch5" data-ch="5" data-part="Hardware" data-short="Motherboard & PCIe" aria-labelledby="ch5-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">05</span>Hardware · Motherboard</p>
+    <h2 id="ch5-h">The motherboard and PCIe lanes</h2>
+    <p class="ch-lead">The board is the city map. PCIe lanes are highways — a budget you spend.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>The city map</h3><p>Every part plugs into the motherboard, and it decides how many lanes of traffic each part gets.</p></article>
+    <article class="card"><h3>Lanes are highways</h3><p>A GPU wants <b>16 lanes</b>; an NVMe drive wants <b>4</b>. Run out of lanes and parts slow down or don't work.</p></article>
+    <article class="card"><h3>Each generation doubles</h3><p>A <b>PCIe 5.0</b> drive on 4 lanes moves about <b>16 GB/s</b> — a 4K movie in seconds.</p></article>
+    <article class="card"><h3>The socket must match</h3><p>An AMD EPYC chip will never fit an Intel Xeon board, and vice versa. Check BIOS support for newer CPUs too.</p></article>
+  </div>
+  <figure class="viz" data-visual="board" style="--ar:16/10;--ar-sm:3/4" aria-labelledby="v-board-t" aria-describedby="v-board-d">
+    <figcaption id="v-board-t"><span class="tag">Try it</span> Motherboard city · hover a district</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-board-d">An isometric server motherboard. The CPU socket is downtown, memory slots are warehouses beside it, PCIe slots are highway on-ramps, plus the BMC chip, M.2 slot and power connectors. Data beads travel along copper traces. A dual-socket toggle adds a second CPU joined by a bridge; reaching the other CPU's memory takes longer (NUMA).</p></details>
+  </figure>
+  <figure class="viz" data-visual="pcie" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-pcie-t" aria-describedby="v-pcie-d">
+    <figcaption id="v-pcie-t"><span class="tag">Try it</span> PCIe highway &amp; lane budget</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-pcie-d">Lanes from the CPU to a device. Changing lane width (x1 to x16) adds lanes; changing generation (3, 4, 5) doubles bead speed. A lane budget bar fills as you add GPUs, NVMe drives and network cards, and turns red when you exceed the CPU's lanes.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · PCIe</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Generation</th><th>Per lane (one way)</th><th>x4 (NVMe)</th><th>x16 (GPU)</th></tr></thead><tbody>
+      <tr><td>Gen 3</td><td>≈ 1 GB/s</td><td>≈ 4 GB/s</td><td>≈ 16 GB/s</td></tr>
+      <tr><td>Gen 4</td><td>≈ 2 GB/s</td><td>≈ 8 GB/s</td><td>≈ 32 GB/s</td></tr>
+      <tr><td>Gen 5</td><td>≈ 4 GB/s</td><td>≈ 16 GB/s</td><td>≈ 64 GB/s</td></tr>
+    </tbody></table>
+    <p class="approx">CPU lane budgets: AMD EPYC 9005 = 128 lanes · Intel Xeon 6700P = 88 · entry chips ≈ 16–28.</p></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>Physical x16 slot wired x8</li><li>M.2 sharing lanes with SATA</li><li>Forgetting bifurcation</li><li>Old BIOS, new CPU</li><li>Risers sold separately</li></ul>
+</section>
+
+<!-- CH 6 -->
+<section class="chapter" id="ch6" data-ch="6" data-part="Hardware" data-short="CPU: workers & speed" aria-labelledby="ch6-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">06</span>Hardware · CPU</p>
+    <h2 id="ch6-h">The CPU: workers and speed</h2>
+    <p class="ch-lead">Cores are how many jobs at once. Clock is how fast each job goes. Your workload decides which matters.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Cores = workers</h3><p>Lots of users? Get more workers. One heavy task? Get faster workers (higher <b>GHz</b>).</p></article>
+    <article class="card"><h3>Threads ≠ double</h3><p>Threads let each core juggle two tasks. That adds roughly <b>10–30%</b> more throughput, not 2×.</p></article>
+    <article class="card"><h3>Cache = a desk nearby</h3><p>A bigger cache means fewer slow trips down the hall to the memory “freezer”.</p></article>
+    <article class="card"><h3>TDP = heat</h3><p>Roughly how many watts of heat the chip makes: <b>65–500 W</b> on servers. Cooling and power must keep up.</p></article>
+  </div>
+  <figure class="viz" data-visual="kitchen" style="--ar:16/10;--ar-sm:4/5" aria-labelledby="v-kit-t" aria-describedby="v-kit-d">
+    <figcaption id="v-kit-t"><span class="tag sig">★ Signature</span> The kitchen · cores, clock, cache</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-kit-d">A CPU drawn as a kitchen. Each core is a chef station; order tickets wait on a rail. A metronome sets the clock speed. Sliders change the number of chefs and the tempo, and a switch changes the orders between many small orders (more chefs help) and one giant cake (only a faster tempo helps). Cache levels are drawn as ingredients at increasing distance from each chef.</p></details>
+  </figure>
+  <figure class="viz" data-visual="amdahl" style="--ar:16/7;--ar-sm:4/3" aria-labelledby="v-amd-t" aria-describedby="v-amd-d">
+    <figcaption id="v-amd-t">Why more cores stop helping</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-amd-d">A speed-up curve (Amdahl's law). If only part of a job can be split between cores, adding cores gives less and less benefit; the curve flattens toward a ceiling.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · 2026 CPUs</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Family</th><th>Cores</th><th>Memory channels</th><th>PCIe lanes</th><th>Good for</th></tr></thead><tbody>
+      <tr><td>AMD EPYC 4005</td><td>up to 16</td><td>2</td><td>≈ 28</td><td>Small business, game servers</td></tr>
+      <tr><td>Intel Xeon 6300 / E-2400</td><td>up to 8</td><td>2</td><td>≈ 20</td><td>Entry towers</td></tr>
+      <tr><td>AMD EPYC 9005 “Turin”</td><td>16–192</td><td>12</td><td>128</td><td>Virtualization, databases</td></tr>
+      <tr><td>Intel Xeon 6700P</td><td>up to 86</td><td>8</td><td>88</td><td>Mainstream enterprise</td></tr>
+      <tr><td>EPYC 9xx5F</td><td>8–64 @ ~5 GHz</td><td>12</td><td>128</td><td>Per-core-licensed databases, games</td></tr>
+    </tbody></table>
+    <p class="approx">Rule of thumb: cores ≈ peak requests/s × CPU-ms per request ÷ 1000 × 1.5. e.g. 2,000 req/s × 5 ms → 10 busy cores → buy 16.</p></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>Old dual Xeons idling at 150 W+</li><li>Many slow cores for game servers</li><li>Forgetting per-core licensing</li><li>Wrong heatsink height (1U vs 2U)</li></ul>
+</section>
+
+<!-- CH 7 -->
+<section class="chapter" id="ch7" data-ch="7" data-part="Hardware" data-short="Memory: the workbench" aria-labelledby="ch7-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">07</span>Hardware · Memory</p>
+    <h2 id="ch7-h">Memory (RAM): the workbench</h2>
+    <p class="ch-lead">RAM is the desk — fast and small. Storage is the filing cabinet — big and slow. Servers use ECC because silent mistakes are the scariest kind.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>The workbench</h3><p>If the job doesn't fit on the bench, the server shuffles work to slow storage — and everything crawls.</p></article>
+    <article class="card"><h3>ECC isn't optional</h3><p>Error-correcting memory catches and fixes flipped bits before they corrupt your data.</p></article>
+    <article class="card"><h3>Fill every channel</h3><p>Memory travels on channels, like checkout lanes. 12 sticks across 12 channels beats 6 sticks with half the lanes closed.</p></article>
+    <article class="card"><h3>Use identical sticks</h3><p>Mixing sizes, speeds or types can slow everything down, or stop the server from booting.</p></article>
+  </div>
+  <figure class="viz" data-visual="latency" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-lat-t" aria-describedby="v-lat-d">
+    <figcaption id="v-lat-t"><span class="tag sig">★ Signature</span> The latency race · at human scale</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-lat-d">If one nanosecond were one second: CPU cache answers in 1 second, the L3 cache in 10 seconds, RAM in about a minute and a half, an NVMe SSD in about a day, and a hard drive in about four months.</p></details>
+  </figure>
+  <figure class="viz" data-visual="desk" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-desk-t" aria-describedby="v-desk-d">
+    <figcaption id="v-desk-t"><span class="tag">Try it</span> Desk vs filing cabinet · shrink the RAM</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-desk-d">A desk (RAM) and a filing cabinet (storage). When the working set is bigger than the desk, papers shuttle back and forth (swapping) and the throughput meter collapses.</p></details>
+  </figure>
+  <figure class="viz" data-visual="channels" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-chan-t" aria-describedby="v-chan-d">
+    <figcaption id="v-chan-t"><span class="tag">Try it</span> Channel puzzle · populate the slots</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-chan-d">Twelve memory channels around a CPU, two slots each. Click slots to add memory sticks. Bandwidth equals populated channels × speed × 8 bytes. Unbalanced layouts are flagged; adding a second stick per channel lowers speed.</p></details>
+  </figure>
+  <figure class="viz" data-visual="ecc" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-ecc-t" aria-describedby="v-ecc-d">
+    <figcaption id="v-ecc-t"><span class="tag">Try it</span> Cosmic ray · ECC on vs off</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-ecc-d">A particle strikes a memory chip and flips one bit. With ECC on, a check catches and corrects it. With ECC off, a bank balance silently changes.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · memory</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Spec</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
+      <tr><td>Capacity</td><td>Size of the workbench</td><td>Web 8–32 GB · NAS 16–64 GB · VM lab 64–256 GB</td></tr>
+      <tr><td>Type</td><td>Must match platform</td><td>ECC UDIMM (entry) · RDIMM (mainstream) · 3DS/LRDIMM (huge) · MRDIMM (Xeon 6900P)</td></tr>
+      <tr><td>Speed</td><td>Per-channel MT/s</td><td>DDR5-4800 / 5600 / 6400</td></tr>
+      <tr><td>Bandwidth</td><td>channels × MT/s × 8 bytes</td><td>12 × DDR5-6400 = 614 GB/s · 1 stick = 51 GB/s</td></tr>
+    </tbody></table>
+    <p class="approx">DDR5's built-in “on-die ECC” is not the same as server ECC memory.</p></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>Unbalanced channels</li><li>Mixing RDIMM &amp; LRDIMM</li><li>Consumer non-ECC RAM</li><li>Paying for speed over capacity</li></ul>
+</section>
+
+<!-- CH 8 -->
+<section class="chapter" id="ch8" data-ch="8" data-part="Hardware" data-short="Storage: trucks vs bikes" aria-labelledby="ch8-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">08</span>Hardware · Storage</p>
+    <h2 id="ch8-h">Storage: trucks vs bikes</h2>
+    <p class="ch-lead">Spinning disks are cheap capacity but slow at random work. NVMe is a highway straight to the CPU.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Trucks and bikes</h3><p><b>Throughput</b> is how much moves at once — a truck. <b>IOPS</b> is how many small trips per second — a swarm of bikes. Databases need bikes; video needs trucks.</p></article>
+    <article class="card"><h3>200 vs 1,000,000</h3><p>A hard drive manages about <b>200</b> random reads per second. An NVMe SSD can do over <b>a million</b>.</p></article>
+    <article class="card"><h3>HDDs still win on price</h3><p>About <b>30 TB</b> per drive for cheap — perfect for backups and media libraries.</p></article>
+    <article class="card"><h3>SSDs wear out</h3><p>“<b>1 DWPD</b>” means you can rewrite the whole drive once a day, every day, for the warranty.</p></article>
+  </div>
+  <figure class="viz" data-visual="drives" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-drv-t" aria-describedby="v-drv-d">
+    <figcaption id="v-drv-t"><span class="tag">Try it</span> Three drives, one workload</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-drv-d">Cutaway of a hard drive with a spinning platter and moving arm, a SATA SSD with one narrow queue, and an NVMe SSD with many parallel queues over four PCIe lanes. On random work the hard drive's arm jitters and its operations per second collapse. A race shows copying one 10 GB file versus reading 100,000 tiny files.</p></details>
+  </figure>
+  <figure class="viz" data-visual="shelf" style="--ar:16/7;--ar-sm:4/5" aria-labelledby="v-shelf-t" aria-describedby="v-shelf-d">
+    <figcaption id="v-shelf-t"><span class="tag">Try it</span> Form-factor shelf · will it fit the bay?</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-shelf-d">3.5-inch, 2.5-inch, M.2, U.2 and E3.S drives drawn to scale. Choosing a drive and a bay shows whether it fits, and an endurance meter shows how many terabytes it can write.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · drives</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Type</th><th>Sequential</th><th>Random IOPS</th><th>Latency</th><th>Best for</th></tr></thead><tbody>
+      <tr><td>HDD 7,200 rpm</td><td>≈ 250 MB/s</td><td>≈ 200</td><td>5–10 ms</td><td>Bulk, backup, media</td></tr>
+      <tr><td>SATA SSD</td><td>≈ 550 MB/s</td><td>≈ 90k</td><td>≈ 100 µs</td><td>Boot, light VMs</td></tr>
+      <tr><td>NVMe Gen4</td><td>≈ 7 GB/s</td><td>≈ 1M</td><td>≈ 60 µs</td><td>VMs, databases</td></tr>
+      <tr><td>NVMe Gen5</td><td>≈ 13 GB/s</td><td>≈ 2.5M</td><td>≈ 50 µs</td><td>Heavy databases, AI data</td></tr>
+    </tbody></table>
+    <p class="approx">Endurance: TBW = capacity × DWPD × 365 × warranty years. 3.84 TB × 1 × 365 × 5 ≈ 7 PB.</p></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>SMR drives in RAID</li><li>Consumer SSDs without power-loss protection</li><li>NVMe in SATA-only bays</li><li>Booting from the data array</li></ul>
+</section>
+
+<!-- CH 9 -->
+<section class="chapter" id="ch9" data-ch="9" data-part="Hardware" data-short="RAID" aria-labelledby="ch9-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">09</span>Hardware · Data protection</p>
+    <h2 id="ch9-h">RAID: surviving a dead drive</h2>
+    <p class="ch-lead">RAID keeps you running when a drive dies. It does not save you from mistakes.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Many drives, one volume</h3><p>Depending on the level you gain speed, safety, or both — but always trade away some capacity.</p></article>
+    <article class="card"><h3>Pick a level</h3><p><b>RAID 1</b> mirrors. <b>RAID 10</b> mirrors and stripes: fast and safe. <b>RAID 6</b> survives any two drives dying.</p></article>
+    <article class="card"><h3>Rebuilds are fragile</h3><p>Rebuilding a huge drive can take a day or more, and the array is vulnerable until it finishes.</p></article>
+    <article class="card"><h3>RAID is not a backup</h3><p>Delete a file or get hit by ransomware and RAID faithfully destroys every copy instantly.</p></article>
+  </div>
+  <figure class="viz" data-visual="raid" style="--ar:16/10;--ar-sm:3/4" aria-labelledby="v-raid-t" aria-describedby="v-raid-d">
+    <figcaption id="v-raid-t"><span class="tag sig">★ Signature</span> RAID lab · kill a drive</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-raid-d">A small picture is split into blocks and striped across several drives using real bytes. Parity blocks are computed with XOR. Choose RAID 0, 1, 5, 6 or 10, then fail drives: RAID 0 loses the picture, RAID 5 rebuilds a missing block from parity, RAID 6 survives two failures. Replacing a drive starts a rebuild. A delete button shows the file disappearing from every drive at once.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · 4 × 8 TB drives</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Level</th><th>Usable</th><th>Survives</th><th>Writes</th><th>Use</th></tr></thead><tbody>
+      <tr><td>RAID 0</td><td>32 TB</td><td>0 failures</td><td>Fastest</td><td>Scratch only</td></tr>
+      <tr><td>RAID 1</td><td>8 TB (2 drives)</td><td>1</td><td>Like 1 drive</td><td>Boot drives</td></tr>
+      <tr><td>RAID 5</td><td>24 TB</td><td>1</td><td>Slow (4× penalty)</td><td>Small SSD arrays</td></tr>
+      <tr><td>RAID 6</td><td>16 TB</td><td>any 2</td><td>Slower (6×)</td><td>Big HDD arrays, NAS</td></tr>
+      <tr><td>RAID 10</td><td>16 TB</td><td>1 per mirror</td><td>Great (2×)</td><td>VMs, databases</td></tr>
+    </tbody></table>
+    <p class="approx">Hardware RAID card (with battery-backed cache) vs HBA/“IT mode” passing raw disks to ZFS: never put ZFS on top of hardware RAID.</p></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>RAID 5 with huge HDDs</li><li>ZFS on hardware RAID</li><li>No spare drive on the shelf</li><li>Ignoring “degraded” alerts</li><li>Thinking RAID is a backup</li></ul>
+</section>
+
+<!-- CH 10 -->
+<section class="chapter" id="ch10" data-ch="10" data-part="Hardware" data-short="Power: watts in" aria-labelledby="ch10-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">10</span>Hardware · Power</p>
+    <h2 id="ch10-h">Power: watts in</h2>
+    <p class="ch-lead">Two power supplies on two circuits means pulling one changes nothing — if one alone can carry the whole load.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Redundant supplies</h3><p>Two hot-swap PSUs share the load. If one dies, the other carries <b>everything</b> — so each must be big enough alone.</p></article>
+    <article class="card"><h3>Size with headroom</h3><p>Add up every part's maximum watts, then add <b>25%</b>. A 730 W build → 2 × 1100 W supplies.</p></article>
+    <article class="card"><h3>Efficiency = less heat</h3><p><b>80 PLUS Titanium</b> wastes about 4% as heat; Bronze wastes 15%. Waste costs money twice: power and cooling.</p></article>
+    <article class="card"><h3>A UPS is a battery bridge</h3><p>It rides through power blips and gives the server minutes to shut down cleanly in an outage.</p></article>
+  </div>
+  <figure class="viz" data-visual="psu" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-psu-t" aria-describedby="v-psu-d">
+    <figcaption id="v-psu-t"><span class="tag sig">★ Signature</span> Pull the plug · redundant power</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-psu-d">The back of a server with two power supplies fed from two separate circuits, A and B. Pull one supply or trip one circuit and the other takes 100% of the load while the fans keep spinning. In mistake mode, both supplies share circuit A, so tripping A turns everything off.</p></details>
+  </figure>
+  <figure class="viz" data-visual="budget" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-bud-t" aria-describedby="v-bud-d">
+    <figcaption id="v-bud-t"><span class="tag">Try it</span> Power budget builder</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-bud-d">A stacked bar of watts for CPU, memory, drives, fans, network card and GPU. Lines mark the power supply capacity and the rule that one supply must carry everything. Readouts show recommended supply size, yearly electricity cost and heat in BTU per hour.</p></details>
+  </figure>
+  <figure class="viz" data-visual="efficiency" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-eff-t" aria-describedby="v-eff-d">
+    <figcaption id="v-eff-t">80 PLUS efficiency curve · and UPS runtime</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-eff-d">Efficiency versus load for Bronze, Gold, Platinum and Titanium supplies, peaking around 50% load. A dot shows the current operating point and wasted heat. A battery shows UPS runtime minutes for the current load.</p></details>
+  </figure>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>Sizing by both PSUs combined</li><li>Both PSUs on one power strip</li><li>Forgetting 120 V derating</li><li>No UPS auto-shutdown</li></ul>
+</section>
+
+<!-- CH 11 -->
+<section class="chapter" id="ch11" data-ch="11" data-part="Hardware" data-short="Cooling: heat out" aria-labelledby="ch11-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">11</span>Hardware · Cooling</p>
+    <h2 id="ch11-h">Cooling: heat out</h2>
+    <p class="ch-lead">Every watt in becomes heat out. Air must flow one way through a sealed path — every gap or dead fan makes a hot spot.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Front to back</h3><p>Servers breathe cool air in the front and blow hot air out the back. Never block either end.</p></article>
+    <article class="card"><h3>Shrouds and blanks matter</h3><p>Missing the plastic air shroud or a blanking panel? Air sneaks around the parts instead of through them.</p></article>
+    <article class="card"><h3>Fans are N+1</h3><p>A fan wall can lose one fan; the others ramp up. Passive heatsinks rely entirely on that wall.</p></article>
+    <article class="card"><h3>1 W = 3.41 BTU/hr</h3><p>A 300 W server heats a room like a small space heater on low. Plan the exhaust.</p></article>
+  </div>
+  <figure class="viz" data-visual="wind" style="--ar:16/9;--ar-sm:3/4" aria-labelledby="v-wind-t" aria-describedby="v-wind-d">
+    <figcaption id="v-wind-t"><span class="tag sig">★ Signature</span> Wind tunnel · live airflow &amp; heat</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-wind-d">A top-down cutaway of a server with a live airflow and temperature simulation. Air particles flow from front fans past drives, memory and CPU heatsinks to the rear. Failing a fan (click it), removing the air shroud, clogging the front intake, or raising CPU load creates hot spots and raises CPU temperature; fans speed up to compensate, and above about 95 °C the CPU throttles.</p></details>
+  </figure>
+  <figure class="viz" data-visual="aisle" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-aisle-t" aria-describedby="v-aisle-d">
+    <figcaption id="v-aisle-t"><span class="tag">Try it</span> Hot aisle / cold aisle · the missing blank</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-aisle-d">Side view of two racks between a cold aisle and a hot aisle. Removing a blanking panel lets hot exhaust curl back to the front, raising intake temperatures for servers above it.</p></details>
+  </figure>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>Running without the shroud</li><li>Closed closet, no exhaust</li><li>Server mounted backwards</li><li>Passive GPU in a quiet tower</li></ul>
+</section>
+
+<!-- CH 12 -->
+<section class="chapter" id="ch12" data-ch="12" data-part="Hardware" data-short="Networking: the pipe" aria-labelledby="ch12-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">12</span>Hardware · Networking</p>
+    <h2 id="ch12-h">Networking hardware: the pipe to the world</h2>
+    <p class="ch-lead">Bandwidth is pipe width. Ports and cables must match. And the slowest link always wins.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Bits ÷ 8 = bytes</h3><p>1 GbE moves about <b>115 MB/s</b> — slower than one modern hard drive.</p></article>
+    <article class="card"><h3>10 GbE is the sweet spot</h3><p>Copying a 50 GB folder drops from about 7 minutes to under 1.</p></article>
+    <article class="card"><h3>RJ45 or SFP</h3><p>RJ45 is the familiar Ethernet jack. SFP is a cage for copper DAC cables or fiber modules. Your switch must match.</p></article>
+    <article class="card"><h3>Slowest link wins</h3><p>Drive, cable, switch, or the laptop on the other end — the narrowest pipe sets your real speed.</p></article>
+  </div>
+  <figure class="viz" data-visual="pipes" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-pipe-t" aria-describedby="v-pipe-d">
+    <figcaption id="v-pipe-t"><span class="tag">Try it</span> Pipe race · send 50 GB</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-pipe-d">Four pipes sized by bandwidth: 1, 10, 25 and 100 gigabit Ethernet. Sending a 50 GB file takes about 7 minutes, 45 seconds, 17 seconds and 4.5 seconds respectively.</p></details>
+  </figure>
+  <figure class="viz" data-visual="chain" style="--ar:16/7;--ar-sm:4/5" aria-labelledby="v-chain-t" aria-describedby="v-chain-d">
+    <figcaption id="v-chain-t"><span class="tag">Try it</span> The slowest link wins</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-chain-d">A chain of pipes from the server's drive through its network card, cable, switch, the client's network card and the client's drive. Widen or narrow any segment; flow through the whole chain is capped by the narrowest one, which glows as the bottleneck.</p></details>
+  </figure>
+  <figure class="viz" data-visual="plug" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-plug-t" aria-describedby="v-plug-d">
+    <figcaption id="v-plug-t"><span class="tag">Try it</span> Plug it in · ports &amp; cables</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-plug-d">A network card with RJ45, SFP+ and QSFP28 ports and a tray of cables: Cat6, DAC twinax and fiber with a transceiver. Matching cables click in and light the link LED; mismatched ones are rejected. A fiber cutaway shows light bouncing along the core.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · network speeds</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>Speed</th><th>Real throughput</th><th>Connector</th><th>50 GB copy</th></tr></thead><tbody>
+      <tr><td>1 GbE</td><td>≈ 115 MB/s</td><td>RJ45</td><td>≈ 7 min</td></tr>
+      <tr><td>2.5 GbE</td><td>≈ 290 MB/s</td><td>RJ45</td><td>≈ 3 min</td></tr>
+      <tr><td>10 GbE</td><td>≈ 1.15 GB/s</td><td>SFP+ or RJ45</td><td>≈ 45 s</td></tr>
+      <tr><td>25 GbE</td><td>≈ 2.9 GB/s</td><td>SFP28</td><td>≈ 17 s</td></tr>
+      <tr><td>100 GbE</td><td>≈ 11.5 GB/s</td><td>QSFP28</td><td>≈ 4.5 s</td></tr>
+    </tbody></table></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>Switch doesn't match the NIC</li><li>Vendor-locked transceivers</li><li>Expecting bonding to speed up one copy</li><li>Bits vs bytes confusion</li></ul>
+</section>
+
+<!-- CH 13 -->
+<section class="chapter" id="ch13" data-ch="13" data-part="Hardware" data-short="The BMC (iDRAC/iLO)" aria-labelledby="ch13-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">13</span>Hardware · Remote management</p>
+    <h2 id="ch13-h">The BMC: a computer inside your computer</h2>
+    <p class="ch-lead">A tiny always-on computer that lets you fix your server from anywhere — even when it's “off”.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Always awake</h3><p>The <b>BMC</b> keeps working while the server is off, as long as it's plugged in.</p></article>
+    <article class="card"><h3>Remote hands</h3><p>From a browser: power on, watch the screen, install an OS, read temperatures — without touching the server.</p></article>
+    <article class="card"><h3>Same idea, different badge</h3><p>Dell calls it <b>iDRAC</b>. HPE calls it <b>iLO</b>. Lenovo: <b>XClarity</b>. Supermicro: <b>BMC/IPMI</b>.</p></article>
+    <article class="card"><h3>A master key</h3><p>Change its default password and <b>never</b> expose it to the internet. Keep it on its own management network.</p></article>
+  </div>
+  <figure class="viz" data-visual="bmc" style="--ar:16/9;--ar-sm:3/4" aria-labelledby="v-bmc-t" aria-describedby="v-bmc-d">
+    <figcaption id="v-bmc-t"><span class="tag sig">★ Signature</span> Lights out, 3 AM · fix it from the couch</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-bmc-d">A dark datacenter row of 40 identical servers; one is frozen with a red fault light. Its BMC chip glows on standby power. From a laptop at home you can blink its ID light to find it, open the virtual console to see its crashed screen, power-cycle it, and mount an install image over the separate management network.</p></details>
+  </figure>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>BMC on the public internet</li><li>Default password left on</li><li>Never updating BMC firmware</li><li>Missing license for remote console</li></ul>
+</section>
+
+<!-- CH 14 -->
+<section class="chapter" id="ch14" data-ch="14" data-part="Hardware" data-short="GPUs (optional)" aria-labelledby="ch14-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">14</span>Hardware · Accelerators <span class="optional-tag">OPTIONAL</span></p>
+    <h2 id="ch14-h">GPUs and accelerators</h2>
+    <p class="ch-lead">GPUs do huge amounts of simple math in parallel. Most servers don't need one — AI, video and 3D do.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>When you need one</h3><p>AI, video transcoding, 3D rendering: jobs made of thousands of small math problems at once.</p></article>
+    <article class="card"><h3>VRAM decides what fits</h3><p>At 4-bit, plan about <b>0.5–0.6 GB per billion</b> AI model parameters, plus extra.</p></article>
+    <article class="card"><h3>Passive cards need wind</h3><p>Server GPUs often have no fans. Put one in a quiet tower and it cooks.</p></article>
+    <article class="card"><h3>Power &amp; fit</h3><p>Big GPUs draw <b>300–600 W</b> and need special cables and risers. Confirm your server supports the card.</p></article>
+  </div>
+  <figure class="viz" data-visual="gpu" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-gpu-t" aria-describedby="v-gpu-d">
+    <figcaption id="v-gpu-t"><span class="tag">Try it</span> 8 professors vs 2,048 students</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-gpu-d">A CPU (a few fast workers) and a GPU (thousands of small workers) each colour a picture. For colouring, which splits perfectly, the GPU finishes in a blink. For solving a maze, which is one long chain of decisions, the GPU workers mostly wait and the CPU wins.</p></details>
+  </figure>
+  <figure class="viz" data-visual="vram" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-vram-t" aria-describedby="v-vram-d">
+    <figcaption id="v-vram-t"><span class="tag">Try it</span> Will the AI model fit?</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-vram-d">Choose an AI model size from 1 to 405 billion parameters and a precision of 16, 8 or 4 bits. Bars show the video memory needed against real cards with 6, 24, 48, 96 and 141 GB, plus a rough tokens-per-second ceiling.</p></details>
+  </figure>
+</section>
+
+<!-- ======================= PART C: BUILD ======================= -->
+<div class="part-divider" id="part-build">
+  <p>Part C · Build</p>
+  <h2>Put it together carefully, in the right order — every connector only fits one way for a reason.</h2>
+  <div class="rule"></div>
+</div>
+
+<!-- CH 15 -->
+<section class="chapter" id="ch15" data-ch="15" data-part="Build" data-short="Putting it together" aria-labelledby="ch15-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">15</span>Build · Assembly</p>
+    <h2 id="ch15-h">Putting it together</h2>
+    <p class="ch-lead">Building is a sequence of small, careful, keyed steps. Inside out, then bench-test before racking.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Ground yourself</h3><p>Static you can't feel can kill a chip. Wear a wrist strap clipped to bare chassis metal.</p></article>
+    <article class="card"><h3>Inside out</h3><p>CPU and memory first, then drives and cards, then cables — so nothing blocks the next step.</p></article>
+    <article class="card"><h3>Bench test first</h3><p>Finding a dead memory stick is easy on a table and miserable in a rack.</p></article>
+    <article class="card"><h3>Two people, bottom up</h3><p>A loaded server can weigh <b>30 kg</b>. Lift with two people and fill racks from the bottom.</p></article>
+  </div>
+  <figure class="viz" data-visual="assembly" style="--ar:16/10;--ar-sm:4/5" aria-labelledby="v-asm-t" aria-describedby="v-asm-d">
+    <figcaption id="v-asm-t"><span class="tag sig">★ Signature</span> Guided build bench · 10 steps</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-asm-d">An open chassis on an anti-static mat with parts floating as blueprint outlines. Ten steps: wrist strap, CPU (align the triangle), thermal paste (too little, right, too much), heatsink screws in a cross pattern, memory per the population map, drives, PCIe cards, fan wall and air shroud, power supplies, and lid on. Each part turns solid as it is installed, with a reason and a common mistake.</p></details>
+  </figure>
+  <details class="numbers"><summary>Full assembly order with the WHY</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>#</th><th>Step</th><th>Why</th></tr></thead><tbody>
+      <tr><td>1</td><td>Check compatibility (QVL, BIOS support, DIMM type, backplane)</td><td>Catches expensive mistakes before unboxing</td></tr>
+      <tr><td>2</td><td>Read the service label under the lid</td><td>Vendor DIMM map and fan order beat any guide</td></tr>
+      <tr><td>3</td><td>Remove lid, air shroud, risers</td><td>Access; set the shroud aside visibly</td></tr>
+      <tr><td>4</td><td>Install CPU, align triangle, don't slide</td><td>Socket pins bend easily</td></tr>
+      <tr><td>5</td><td>Paste + heatsink, screws in numbered X order</td><td>Even pressure = full contact</td></tr>
+      <tr><td>6</td><td>Memory per population chart</td><td>Balanced channels, clean boot</td></tr>
+      <tr><td>7</td><td>Boot device, PCIe cards, backplane cables</td><td>Slot priority affects lanes and cooling</td></tr>
+      <tr><td>8</td><td>Fan wall, then air shroud</td><td>Without the shroud air bypasses the CPU</td></tr>
+      <tr><td>9</td><td>Drives in caddies, blanks in empty bays; PSUs last</td><td>Blanks keep airflow on its path</td></tr>
+      <tr><td>10</td><td>Bench test, 24–48 h burn-in, then rack it</td><td>Flush out dead-on-arrival parts while returnable</td></tr>
+    </tbody></table></div></details>
+  <p class="mistakes-title">Common mistakes</p>
+  <ul class="mistakes"><li>No ESD strap</li><li>Sliding the CPU</li><li>Forgetting the air shroud</li><li>Both PSUs on one circuit</li><li>Racking before testing</li></ul>
+</section>
+
+<!-- ======================= PART D: SOFTWARE ======================= -->
+<div class="part-divider" id="part-software">
+  <p>Part D · Software</p>
+  <h2>Wake the hardware up, give it an operating system, an address, locks and a safety net.</h2>
+  <div class="rule"></div>
+</div>
+
+<!-- CH 16 -->
+<section class="chapter" id="ch16" data-ch="16" data-part="Software" data-short="First power-on" aria-labelledby="ch16-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">16</span>Software · Firmware</p>
+    <h2 id="ch16-h">First power-on: firmware, BIOS, storage</h2>
+    <p class="ch-lead">Firmware is the server's pre-flight checklist. Boot is slow because it checks everything.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Be patient</h3><p>First boot can take several minutes while memory is “trained”. Black screen + roaring fans is normal.</p></article>
+    <article class="card"><h3>Update firmware first</h3><p>Order: <b>BMC → BIOS → storage card → network card → drives</b>. Fixes bugs and closes security holes.</p></article>
+    <article class="card"><h3>Few BIOS settings</h3><p>Turn on virtualization, UEFI boot and Secure Boot; pick a power profile. Leave the rest at defaults.</p></article>
+    <article class="card"><h3>Set up storage now</h3><p>Create a RAID volume in the controller — or switch it to <b>HBA mode</b> if ZFS will manage the drives.</p></article>
+  </div>
+  <figure class="viz" data-visual="boot" style="--ar:16/9;--ar-sm:3/4" aria-labelledby="v-boot-t" aria-describedby="v-boot-d">
+    <figcaption id="v-boot-t"><span class="tag">Try it</span> The boot relay · watch POST</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-boot-d">A relay race of boot stages: power button, BMC, power good, CPU reset, memory training (the longest), PCIe device discovery, option ROMs, boot device, bootloader and kernel, with a terminal printing power-on self-test lines. Faults can be injected: no memory stops at memory training with a beep code; no boot device stops before the bootloader.</p></details>
+  </figure>
+  <figure class="viz" data-visual="bios" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-bios-t" aria-describedby="v-bios-d">
+    <figcaption id="v-bios-t"><span class="tag">Try it</span> BIOS setup · use your keyboard</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-bios-d">A classic text-mode BIOS setup screen navigable with arrow keys and Enter. Settings include virtualization, UEFI boot, Secure Boot, TPM, power profile and boot order, each with a one-line explanation of what it does.</p></details>
+  </figure>
+  <figure class="viz" data-visual="firmware" style="--ar:16/7;--ar-sm:4/5" aria-labelledby="v-fw-t" aria-describedby="v-fw-d">
+    <figcaption id="v-fw-t">Firmware update order · and RAID vs HBA</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-fw-d">Firmware bricks for BMC, BIOS, storage controller, network card and drives, each with a version badge, reflashing in the recommended order. A toggle compares a RAID controller presenting one virtual disk versus an HBA passing every raw disk to the operating system.</p></details>
+  </figure>
+</section>
+
+<!-- CH 17 -->
+<section class="chapter" id="ch17" data-ch="17" data-part="Software" data-short="Installing the OS" aria-labelledby="ch17-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">17</span>Software · Operating system</p>
+    <h2 id="ch17-h">Installing the operating system</h2>
+    <p class="ch-lead">Pick the OS by job. A hypervisor turns one server into many.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Pick by job</h3><p><b>Ubuntu Server</b> for general apps, <b>Proxmox VE</b> for virtual machines, <b>TrueNAS</b> for file storage, <b>Windows Server</b> for Microsoft shops.</p></article>
+    <article class="card"><h3>No monitor needed</h3><p>Mount the installer through the BMC's virtual media and click through setup from your laptop.</p></article>
+    <article class="card"><h3>Separate boot drives</h3><p>Install the OS on small mirrored boot drives. Reinstalling then never touches your data.</p></article>
+    <article class="card"><h3>Licensing matters</h3><p>Windows Server is licensed per CPU core, <b>16-core minimum</b>. More cores = bigger bill.</p></article>
+  </div>
+  <figure class="viz" data-visual="ostree" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-os-t" aria-describedby="v-os-d">
+    <figcaption id="v-os-t"><span class="tag">Try it</span> Which OS? · answer three questions</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-os-d">A decision tree: mostly files leads to TrueNAS; many virtual machines leads to Proxmox VE; needing Active Directory leads to Windows Server; otherwise Ubuntu Server LTS.</p></details>
+  </figure>
+  <figure class="viz" data-visual="layers" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-lay-t" aria-describedby="v-lay-d">
+    <figcaption id="v-lay-t"><span class="tag">Try it</span> The layer cake · bare metal vs hypervisor</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-lay-d">Stacked layers: hardware, firmware, operating system, apps. Switching to a hypervisor inserts a hypervisor layer and splits the layers above into several virtual machines that share the hardware; adding more virtual machines shrinks each one's share of CPU and memory.</p></details>
+  </figure>
+  <figure class="viz" data-visual="install" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-inst-t" aria-describedby="v-inst-d">
+    <figcaption id="v-inst-t">Install path · ISO → boot mirror → partitions</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-inst-d">The installer travels to the server by USB stick or over the BMC management network. It installs onto two mirrored boot drives, separate from the data drives. A partition bar shows the EFI, root, swap and data partitions.</p></details>
+  </figure>
+  <details class="numbers"><summary>Numbers to know · OS choices</summary><div class="tbl-wrap">
+    <table class="spec"><thead><tr><th>OS</th><th>Pick it when</th><th>Notes</th></tr></thead><tbody>
+      <tr><td>Ubuntu Server LTS</td><td>General Linux apps</td><td>Free, 5 years of updates</td></tr>
+      <tr><td>Debian / Rocky / Alma</td><td>Stability, RHEL compatibility</td><td>Free</td></tr>
+      <tr><td>Proxmox VE</td><td>Virtual machines &amp; containers</td><td>Free; built-in ZFS and backups</td></tr>
+      <tr><td>TrueNAS Community</td><td>NAS-first</td><td>Free; wants an HBA and ECC</td></tr>
+      <tr><td>Windows Server 2025</td><td>Active Directory, Microsoft apps</td><td>Per-core licensing + CALs</td></tr>
+    </tbody></table></div></details>
+</section>
+
+<!-- CH 18 -->
+<section class="chapter" id="ch18" data-ch="18" data-part="Software" data-short="Connect & lock down" aria-labelledby="ch18-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">18</span>Software · Network &amp; security</p>
+    <h2 id="ch18-h">Connect and lock it down</h2>
+    <p class="ch-lead">An address, a street, an exit and a phone book. Then: keys beat passwords, close everything you don't need, deny by default.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>A fixed address</h3><p>A static IP (or a reservation on your router) means you can always find the server — like a house number.</p></article>
+    <article class="card"><h3>SSH keys, not passwords</h3><p>The private key stays on your laptop; the public “padlock” goes on the server.</p></article>
+    <article class="card"><h3>Block everything first</h3><p>Firewall rule one: deny all incoming, then open only what you need.</p></article>
+    <article class="card"><h3>Auto-update</h3><p>Most break-ins use bugs patched months earlier. Turn on automatic security updates. Use a VPN instead of port-forwarding.</p></article>
+  </div>
+  <figure class="viz" data-visual="network" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-net-t" aria-describedby="v-net-d">
+    <figcaption id="v-net-t"><span class="tag">Try it</span> A packet's journey · IP, gateway, DNS</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-net-d">A neighbourhood map: the subnet is a street, the server's IP address is its house number, the gateway is the post office leading to the internet, and DNS is a phone-book kiosk. Visiting a website plays a DNS lookup, a trip to the gateway and out to the internet. You can break the gateway, DNS or subnet mask, and switch between temporary DHCP addresses and a static address.</p></details>
+  </figure>
+  <figure class="viz" data-visual="ssh" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-ssh-t" aria-describedby="v-ssh-d">
+    <figcaption id="v-ssh-t"><span class="tag sig">★ Signature</span> Lock &amp; key · how SSH keys work</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-ssh-d">Generating a key splits into a padlock (public key, safe to share) and a key (private key, stays on your laptop). Padlocks are copied to servers. To log in, the server sends a challenge locked with your padlock that only your key can open. Next door, a password door is hammered by bots; turning on fail2ban jails them, and disabling password login bricks that door up.</p></details>
+  </figure>
+  <figure class="viz" data-visual="firewall" style="--ar:16/10;--ar-sm:3/4" aria-labelledby="v-fw2-t" aria-describedby="v-fw2-d">
+    <figcaption id="v-fw2-t"><span class="tag sig">★ Signature</span> The gatekeeper · firewall rules</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-fw2-d">Packets labelled with ports such as 22 (SSH), 443 (HTTPS), 3389 (remote desktop) and 3306 (database) arrive at a firewall. An ordered rule list is checked top to bottom and the first match wins; allowed packets pass and blocked ones bounce into a bin. Presets show a wide-open server, a sensible default-deny setup, and an accidental lock-out with no SSH.</p></details>
+  </figure>
+  <figure class="viz" data-visual="castle" style="--ar:16/8;--ar-sm:4/5" aria-labelledby="v-cas-t" aria-describedby="v-cas-d">
+    <figcaption id="v-cas-t"><span class="tag">Try it</span> Castle of ports · shrink the attack surface</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-cas-d">The server as a fortress with one door per running service. Disabling services you don't need bricks up their doors and shrinks the attack-surface meter. Unpatched bugs appear as cracks; applying updates fills them.</p></details>
+  </figure>
+</section>
+
+<!-- CH 19 -->
+<section class="chapter" id="ch19" data-ch="19" data-part="Software" data-short="Watch it & back it up" aria-labelledby="ch19-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">19</span>Software · Operations</p>
+    <h2 id="ch19-h">Watch it and back it up</h2>
+    <p class="ch-lead">Three copies, two kinds of media, one offsite — and actually test restores. Different disasters destroy different copies.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Alerts before outages</h3><p>Alert on disk health, temperatures and full drives. A 2 a.m. email beats a dead array on Monday.</p></article>
+    <article class="card"><h3>3-2-1</h3><p><b>3</b> copies, on <b>2</b> kinds of storage, with <b>1</b> somewhere else.</p></article>
+    <article class="card"><h3>Test restores</h3><p>A backup you've never restored is a hope, not a backup.</p></article>
+    <article class="card"><h3>One copy offline</h3><p>Keep one copy offline or immutable, so ransomware that reaches your server can't reach it.</p></article>
+  </div>
+  <figure class="viz" data-visual="monitor" style="--ar:16/9;--ar-sm:4/5" aria-labelledby="v-mon-t" aria-describedby="v-mon-d">
+    <figcaption id="v-mon-t"><span class="tag">Try it</span> Mission control · set an alert</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-mon-d">Live charts of CPU, temperature, disk use, network and drive health counters. Drag a threshold line; when a value crosses it a phone buzzes with an alert. Simulating a dying drive makes its error count creep up so the warning fires before it fails.</p></details>
+  </figure>
+  <figure class="viz" data-visual="backup" style="--ar:16/9;--ar-sm:3/4" aria-labelledby="v-bak-t" aria-describedby="v-bak-d">
+    <figcaption id="v-bak-t"><span class="tag sig">★ Signature</span> 3-2-1 survival game</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-bak-d">Build a backup plan from copies on the server, a USB or tape shelf, an offline or immutable copy and an offsite cloud. Then roll disasters: drive failure, accidental deletion, ransomware, fire or flood. A scoreboard shows which copies survived.</p></details>
+  </figure>
+  <figure class="viz" data-visual="rpo" style="--ar:16/6;--ar-sm:4/3" aria-labelledby="v-rpo-t" aria-describedby="v-rpo-d">
+    <figcaption id="v-rpo-t"><span class="tag">Try it</span> How much work could you lose?</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-rpo-d">A timeline with backup ticks. A frequency slider changes how often backups run. A disaster shades the data created since the last backup, which would be lost.</p></details>
+  </figure>
+</section>
+
+<!-- ======================= PART E: GO LIVE ======================= -->
+<div class="part-divider" id="part-live">
+  <p>Part E · Go live</p>
+  <h2>Serve your first request — then design a whole server for your own workload.</h2>
+  <div class="rule"></div>
+</div>
+
+<!-- CH 20 -->
+<section class="chapter" id="ch20" data-ch="20" data-part="Go live" data-short="Go live + configurator" aria-labelledby="ch20-h">
+  <header class="ch-head">
+    <p class="ch-kicker"><span class="ch-num">20</span>Go live</p>
+    <h2 id="ch20-h">Your first service — and your own build</h2>
+    <p class="ch-lead">A balanced server has no single narrow pipe. Buy for your workload, not for the biggest numbers.</p>
+  </header>
+  <div class="cards">
+    <article class="card"><h3>Payoff time</h3><p>Install a web server or file share, open its port in the firewall, then visit the server's address from another device.</p></article>
+    <article class="card"><h3>Containers</h3><p>Package an app with everything it needs, so dozens of services run side by side without fighting.</p></article>
+    <article class="card"><h3>Write it all down</h3><p>Addresses, what's installed, where backups go. Future you will forget — and be very grateful.</p></article>
+  </div>
+  <figure class="viz" data-visual="journey" style="--ar:16/7;--ar-sm:4/5" aria-labelledby="v-jour-t" aria-describedby="v-jour-d">
+    <figcaption id="v-jour-t"><span class="tag">Try it</span> Your first request</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-jour-d">A request travels from a laptop through a switch, the server's network card, the firewall and the operating system to a web server, and a page reading “Hello from my server!” comes back.</p></details>
+  </figure>
+  <figure class="viz" data-visual="configurator" style="--ar:16/10;--ar-sm:3/4" aria-labelledby="v-cfg-t" aria-describedby="v-cfg-d">
+    <figcaption id="v-cfg-t"><span class="tag sig">★ Signature</span> Configurator · find your bottleneck</figcaption>
+    <div class="viz-stage"></div>
+    <div class="viz-controls"></div>
+    <p class="viz-live sr-only" aria-live="polite"></p>
+    <details class="viz-alt"><summary>Describe this visual</summary><p id="v-cfg-d">Pick a workload and set users, data size and budget. A chain of pipes for network, CPU, memory, storage and GPU shows each part's capacity relative to what the workload needs; the narrowest glows as the bottleneck. Upgrading it moves the bottleneck elsewhere. A server preview assembles with your parts, with power, noise, rack height and approximate cost. Power on to finish.</p></details>
+  </figure>
+
+  <h3 class="mistakes-title" style="margin-top:48px">Your launch checklist</h3>
+  <ul class="checklist" id="checklist"></ul>
+
+  <h3 class="mistakes-title" style="margin-top:48px" id="glossary-h">Glossary</h3>
+  <div class="glossary-tools"><label class="sr-only" for="glossary-q">Search the glossary</label><input id="glossary-q" type="search" placeholder="Search 60 terms… (try “ECC” or “IOPS”)" autocomplete="off"></div>
+  <dl class="glossary" id="glossary" aria-labelledby="glossary-h"></dl>
+</section>
+
+<footer class="site-footer">
+  <p>Every picture on this page is drawn live by hand-written JavaScript — Canvas and SVG, no libraries, no image files.</p>
+  <p>Prices and product names are approximate as of late 2026 and change quickly. Simulations are simplified models for learning, not engineering tools.</p>
+</footer>
+
+</div><!-- /wrap -->
+</main>
+
+<aside class="tracker" id="tracker" aria-label="Your build progress">
+  <div class="tracker-head"><span>Your server · <b id="tracker-count">0/20</b></span><button class="tracker-min" id="tracker-min" aria-label="Minimise build tracker" aria-expanded="true">–</button></div>
+  <div class="tracker-stage" id="tracker-stage"></div>
+  <a class="tracker-next" id="tracker-next" href="#ch1">Next: What is a server?</a>
+</aside>
+
+<div class="srv-tip" id="srv-tip" role="tooltip"></div>
+
+<script src="js/core/ns.js" defer></script>
+<script src="js/core/util.js" defer></script>
+<script src="js/core/engine.js" defer></script>
+<script src="js/core/draw.js" defer></script>
+<script src="js/core/iso.js" defer></script>
+<script src="js/core/models.js" defer></script>
+<script src="js/core/store.js" defer></script>
+<script src="js/data/data.js" defer></script>
+<script src="js/ui/ui.js" defer></script>
+<script src="js/ui/tracker.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
