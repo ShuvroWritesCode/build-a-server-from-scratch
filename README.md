@@ -9,6 +9,8 @@
 Every diagram, animation and simulation is drawn live in the browser with hand-written JavaScript.
 No frameworks. No libraries. No image files. No build step.
 
+### [▶ Try it live](https://shuvrowritescode.github.io/build-a-server-from-scratch/)
+
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-6EA8FE.svg)](LICENSE)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-3DDC97.svg)
 ![Vanilla JS](https://img.shields.io/badge/vanilla-JavaScript-FFB224.svg)
@@ -16,7 +18,7 @@ No frameworks. No libraries. No image files. No build step.
 ![Visuals](https://img.shields.io/badge/interactive_visuals-47-E07BE0.svg)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-4CC3FF.svg)](#contributing)
 
-[Getting started](#getting-started) · [What you'll learn](#what-youll-learn) · [Gallery](#gallery) · [How it works](#how-it-works) · [Contributing](#contributing)
+[**Live demo**](https://shuvrowritescode.github.io/build-a-server-from-scratch/) · [Getting started](#getting-started) · [What you'll learn](#what-youll-learn) · [Gallery](#gallery) · [How it works](#how-it-works) · [Contributing](#contributing)
 
 </div>
 
@@ -69,6 +71,8 @@ The page also has a 63-term searchable glossary, a 19-item launch checklist, and
 </table>
 
 ## Getting started
+
+The quickest way in is the live site: **[shuvrowritescode.github.io/build-a-server-from-scratch](https://shuvrowritescode.github.io/build-a-server-from-scratch/)**. Nothing to install.
 
 ### Open it locally
 
