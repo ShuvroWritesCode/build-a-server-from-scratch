@@ -107,10 +107,12 @@ The site is static files, so any static host works.
 - **One coherent art direction ("Lights-Out Blueprint").** Every part is drawn to real millimetre scale in a single isometric projection. Parts "ink in" from wireframe as you learn them.
 - **Shared state across chapters.** The parts you choose for the power budget feed the configurator and other visuals, and progress persists in `localStorage`.
 - **Dark and light themes**, with all canvas colours driven by CSS design tokens.
+- **Sound and touch, opt-in.** A header *Sound* toggle adds a fan hum and airflow bed to the wind tunnel and the power-supply lab, driven live by the simulation (rpm sets pitch and level, a clogged intake muffles the air, dead fans thin the chorus), plus one-shot effects for failures and a BMC-style beep when the CPU throttles. Every sound is synthesized by `tools/make_sounds.py` using only the Python standard library and committed as base64 PCM in `js/data/sounds.js`; there are no audio files and no audio libraries. On phones and tablets, breaking something (a fan, a drive, a power supply, the file) also gives a short vibration.
 
 ### Accessibility
 
 - **Motion:** levels are Full, Calm and Off, set from `prefers-reduced-motion` by default. There's also a global *Pause all*, and every looping visual has its own play/pause control.
+- **Sound:** off by default and never autoplays; the *Sound* button is the unlocking gesture. Voices follow the same pause, offscreen and tab-hidden rules as animation, so a paused visual is a silent one. Vibration fires only on failure states, never for success, and only on devices with a coarse pointer.
 - **Screen readers:** every visual has a text description that updates as its state changes, and throttled live-region announcements.
 - **Controls:** every canvas interaction has a real DOM control (button, slider, toggle, select). There are no drag-only actions.
 - **Colour:** status is never shown by colour alone. Glyphs (✓ ⚠ ✕), hatching and numbers back it up, and the heat ramp has monotonic luminance.
@@ -140,10 +142,14 @@ js/
     iso.js            Isometric camera, face-local decal painting, shading, painter's sort
     models.js         Shared server models (2U chassis, parts, rack)
     store.js          Tiny reactive store
+    audio.js          Web Audio layer: on-demand PCM decode, per-visual looping voices, one-shots
+    haptics.js        Vibration API wrapper (phones/tablets only, failures only)
   data/data.js        Glossary, checklist, workloads, parts catalogue, shared build store
+  data/sounds.js      GENERATED sound effects as base64 PCM (see tools/make_sounds.py)
   ui/                 Page chrome (TOC, progress, theme, glossary) and the build tracker
   visuals/<id>.js     One file per visual, loaded on demand
   main.js             Boot sequence
+tools/make_sounds.py  Synthesizes every sound effect with the Python standard library → js/data/sounds.js
 docs/screenshots/     Images for this README only (the site itself uses none)
 ```
 
@@ -185,7 +191,7 @@ Contributions are welcome, from typo fixes to whole new visuals.
 1. Fork the repo and create a branch: `git checkout -b feat/my-visual`.
 2. Keep to the project rules:
    - vanilla JS, classic scripts, no dependencies;
-   - no image files in the site itself;
+   - no image files in the site itself; sounds are regenerated with `python3 tools/make_sounds.py` (standard library only), never committed as audio files;
    - colours only from `S.pal`;
    - every interaction reachable from a DOM control;
    - working layouts at 375 px wide and in both themes.

@@ -29,6 +29,8 @@
       var self = this;
       this.tween({ from: 1, to: 0, dur: 0.8, ease: 'fail', onUpdate: function (v) { self.desk.fade = v; } });
       this.tween({ from: 0, to: 1, dur: 0.6, onUpdate: function (v) { self.srv.spare = v; } });
+      S.audio.play('fanFail', { level: 0.5, rate: kind === 'psu' ? 0.8 : 1.3 });
+      S.haptics.fail('fail');
       this.announce(kind === 'psu' ? 'Power supply failed. The desktop is dead. The server switched to its second power supply and keeps serving.' :
         'A drive failed. The desktop lost its only drive. The server keeps running on its mirrored drive.');
       this.bPsu.setDisabled(true); this.bDrive.setDisabled(true);

@@ -97,6 +97,7 @@
         if (v.smart > 32 && !this.failed) {
           this.failed = true; this.dying = false; this.failAt = this.sampleN;
           this.pushCard('CRITICAL: disk2 FAILED · RAID degraded, rebuilding onto spare', 'fault');
+          S.audio.play('alarm', { level: 0.4 }); S.haptics.fail('fail');
           if (this.alertAt >= 0) {
             var lead = (this.failAt - this.alertAt) * FF;
             this.announce('Disk 2 failed. The SMART alert came ' + U.fmtTime(lead) + ' earlier — enough time to swap it.');

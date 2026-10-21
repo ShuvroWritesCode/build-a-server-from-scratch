@@ -188,11 +188,15 @@
       this.fx = this.layer();
       this.cfg = { fans: [true, true, true, true, true, true], shroud: true, clogged: false };
       this.load = 0.7; this.cpuW = S.build.get().cpuTdp || 280; this.rpm = 0.6; this.auto = true; this.angle = 0; this.temp = 40;
+      // sound: the fan wall hums (pitch and level follow rpm) and the air it moves is a noise bed
+      // whose level follows airflow and whose brightness drops when the intake is clogged
+      this.vHum = S.audio.voice('hum', 0.55);
+      this.vWind = S.audio.voice('wind', 0.7);
       var self = this;
       var g1 = this.ui.group('Break the airflow');
       this.bFan = g1.button('✕ Fail fan 3', function () { self.toggleFan(2); }, { kind: 'danger' });
       this.tShroud = g1.toggle({ label: 'Air shroud', value: true, onChange: function (v) { self.cfg.shroud = v; self.rebuild(); self.announce(v ? 'Air shroud installed: air is forced through the heatsink.' : 'Air shroud removed: air sneaks around the heatsink. Watch the CPU temperature climb.'); } });
-      this.tClog = g1.toggle({ label: 'Clogged / blocked intake', value: false, onChange: function (v) { self.cfg.clogged = v; self.rebuild(); self.announce(v ? 'The front intake is blocked by dust or a wall: every fan struggles and the whole server heats up.' : 'Intake cleared.'); } });
+      this.tClog = g1.toggle({ label: 'Clogged / blocked intake', value: false, onChange: function (v) { self.cfg.clogged = v; self.rebuild(); if (v) S.haptics.fail('fail'); self.announce(v ? 'The front intake is blocked by dust or a wall: every fan struggles and the whole server heats up.' : 'Intake cleared.'); } });
       this.ui.br();
       var g2 = this.ui.group('Load');
       g2.slider({ label: 'CPU load', min: 0, max: 100, step: 1, value: 70, fmt: function (v) { return v + '%'; }, onInput: function (v) { self.load = v / 100; } });
@@ -215,6 +219,8 @@
       this.cfg.fans[i] = !this.cfg.fans[i];
       this.bFan.setLabel(this.cfg.fans[2] ? '✕ Fail fan 3' : '↺ Replace fan 3');
       this.rebuild();
+      if (this.cfg.fans[i]) S.audio.play('clack', { level: 0.6 });
+      else { S.audio.play('fanFail', { rate: 0.9 + i * 0.04 }); S.haptics.fail('fail'); }
       this.announce(this.cfg.fans[i] ? 'Fan ' + (i + 1) + ' replaced.' : 'Fan ' + (i + 1) + ' failed. Its lane goes still and a hot pocket forms behind it; the other fans ramp up.');
     },
     resize: function (w, h) {
@@ -289,11 +295,16 @@
         P.x[i] = x; P.y[i] = y;
       }
       this.angle += dt * (6 + 30 * this.rpm);
+      // sound follows the simulation: pitch tracks rpm, the hum thins as fans die, airflow scales
+      // with the fan wall's live area and is muffled by a clogged intake
+      var flow = this.rpm * (0.35 + 0.65 * alive / 6) * (this.cfg.clogged ? 0.45 : 1);
+      this.vHum.set({ rate: 0.55 + 0.75 * this.rpm, level: (0.25 + 0.75 * this.rpm) * (0.4 + 0.6 * alive / 6), lp: 2500 + 6000 * this.rpm });
+      this.vWind.set({ rate: 0.85 + 0.3 * this.rpm, level: flow, lp: this.cfg.clogged ? 500 : 900 + 2600 * flow });
       var thr = this.temp > 95;
       this.rCpu.set(Math.round(this.temp) + ' °C', this.temp > 95 ? 'bad' : this.temp > 82 ? 'warn' : 'ok');
       this.rFan.set(Math.round(4000 + 12000 * this.rpm) + ' rpm', this.rpm > 0.9 ? 'warn' : '');
       this.rState.set(thr ? 'THROTTLING' : this.temp > 82 ? 'HOT' : 'OK', thr ? 'bad' : this.temp > 82 ? 'warn' : 'ok');
-      if (thr && !this._thrAnn) { this._thrAnn = true; this.announce('CPU above 95 degrees: it throttles its clock speed to protect itself.'); }
+      if (thr && !this._thrAnn) { this._thrAnn = true; S.audio.play('alarm', { level: 0.5 }); S.haptics.fail('critical'); this.announce('CPU above 95 degrees: it throttles its clock speed to protect itself.'); }
       if (!thr) this._thrAnn = false;
     },
     drawStatic: function () {
