@@ -34,6 +34,7 @@
       this.wBr = [325, 325];       // smoothed watts per breaker/PDU
       this.wBoard = 650;
       this.fan = 1; this.fanAng = 0;
+      this.vHum = S.audio.voice('hum', 0.4); // the server's fans: audible spin-up and inertial coast-down
       this.cord = [[], []]; this.pathTmp = [];
       this.lastMode = 'ok2';
       var self = this;
@@ -84,6 +85,7 @@
 
     // ---------------------------------------------------------------- state changes
     setPulled: function (i, v, fromDrag) {
+      if (v !== this.st.pulled[i]) { S.audio.play('clack', { level: v ? 0.7 : 0.5, rate: v ? 0.8 : 1.1 }); if (v) S.haptics.fail('fail'); }
       this.st.pulled[i] = v;
       var self = this;
       if (this.offTw) this.offTw.cancel();
@@ -93,6 +95,8 @@
       this.evaluate(true);
     },
     setBreaker: function (which, on) {
+      S.audio.play('clack', { level: 0.8, rate: 0.6 });
+      if (!on) S.haptics.fail('fail');
       if (which === 'A') this.st.brA = on; else this.st.brB = on;
       this.bTrip.setLabel(this.st.brA ? '⚡ Trip breaker A' : '↺ Reset breaker A');
       this.evaluate(true);
@@ -140,6 +144,7 @@
       var cls = mode === 'ok2' ? 'ok' : mode === 'ok1' ? 'ok' : mode === 'over' ? 'warn' : 'bad';
       var txt = { ok2: 'running · redundant', ok1: 'still running ✓', over: 'running · not redundant', trip: 'OFF · overload', out: 'OFF · outage' }[mode];
       this.rState.set(txt, cls);
+      if (speak && mode !== this.lastMode && (mode === 'trip' || mode === 'out')) { S.audio.play('fanFail', { level: 0.6, rate: 0.7 }); S.haptics.fail('critical'); }
       if (speak && mode !== this.lastMode) {
         var survivor = inPow[0] ? 1 : 2;
         var msg = {
@@ -196,6 +201,8 @@
       this.fan = U.damp(this.fan, this.on ? 1 : 0, this.on ? 2.2 : 0.55, dt);
       if (!this.on && this.fan < 0.004) this.fan = 0;
       this.fanAng += dt * this.fan * 38;
+      var f = this.fan, load = U.clamp((this.st.load - 300) / 1000, 0, 1);
+      this.vHum.set({ rate: 0.45 + 0.8 * f + 0.15 * load, level: f * f * (0.6 + 0.4 * load), lp: 1200 + 7000 * f });
     },
 
     // ---------------------------------------------------------------- drawing

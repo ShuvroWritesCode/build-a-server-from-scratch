@@ -88,6 +88,16 @@
     function syncTheme() { themeBtn.setAttribute('aria-label', 'Switch to ' + (S.prefs.theme === 'dark' ? 'light' : 'dark') + ' theme'); }
     themeBtn.addEventListener('click', function () { S.setPref('theme', S.prefs.theme === 'dark' ? 'light' : 'dark'); syncTheme(); drawBrand(); });
     syncTheme();
+    var soundBtn = doc.getElementById('sound-btn');
+    function syncSound() {
+      var on = S.audio.enabled;
+      soundBtn.setAttribute('aria-pressed', String(on));
+      soundBtn.setAttribute('aria-label', (on ? 'Turn sound effects off' : 'Turn sound effects on') + (S.audio.supported ? '' : ' (not supported in this browser)'));
+    }
+    if (!S.audio.supported) soundBtn.disabled = true;
+    soundBtn.addEventListener('click', function () { S.audio.setEnabled(!S.audio.enabled); syncSound(); });
+    S.on('sound', syncSound);
+    syncSound();
 
     // ---------- glossary ----------
     var gl = doc.getElementById('glossary'), q = doc.getElementById('glossary-q');

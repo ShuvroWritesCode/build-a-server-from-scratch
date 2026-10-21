@@ -186,6 +186,8 @@
       this.tween({ from: 1, to: 0, dur: 0.8, onUpdate: function (v) { self.flash['d' + d] = v; } });
       this.updateStatus();
       var st = this.status;
+      S.audio.play('fanFail', { level: 0.5, rate: 1.4 });
+      S.haptics.fail(st === 'FAILED' ? 'critical' : 'fail');
       this.announce('Drive ' + (d + 1) + ' failed. Array is ' + st.toLowerCase() + '.' + (st === 'FAILED' ? ' Data lost.' : ' Data is still readable' + (this.level >= 5 && this.level !== 10 ? ' — missing blocks are recomputed from parity.' : ' from the mirror.')));
     },
     killRandom: function () {
@@ -225,6 +227,7 @@
       if (this.deleted) return;
       var self = this;
       this.tween({ from: 0, to: 1, dur: 1.1, ease: 'inOutCubic', onUpdate: function (v) { self.deleted = Math.max(0.0001, v); } });
+      S.haptics.fail('critical');
       this.announce('The file was deleted. RAID copied the deletion to every drive instantly. RAID is not a backup.');
     },
     updateStatus: function () {
