@@ -155,6 +155,7 @@ js/
   main.js             Boot sequence
 tools/make_sounds.py  Synthesizes every sound effect with the Python standard library → js/data/sounds.js
 docs/screenshots/     Images for this README only (the site itself uses none)
+docs/og-card.jpg      Link-preview card for social shares (referenced only by meta tags)
 ```
 
 ### Anatomy of a visual
